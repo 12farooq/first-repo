@@ -1,0 +1,38 @@
+name: Zip and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  zip_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Archive Repository
+        run: |
+          zip -r ${{ github.workspace }}/archive.zip .
+        working-directory: ${{ github.workspace }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: my-artifact
+          path: ${{ github.workspace }}/archive.zip
+
+      - name: SSH Server Deploy
+        uses: kostya-ten/ssh-server-deploy@v4
+        with:
+          host: ''
+          port: 22
+          username: ''
+          password: ''
+          scp_source: ${{ github.workspace }}/archive.zip
+          scp_target: /media/server/side
+          
+
+
